@@ -1,5 +1,5 @@
 import os
-
+from core import save_message, add_message, get_messages
 
 try:
     while True:
@@ -10,7 +10,7 @@ try:
 
         #best_doc = find_best_document(user_input, doc_embeddings)
 
-        messages.append({"role": "user", "content": user_input})
+        add_message("user", user_input)
         save_message("user", user_input)
 
         #messages_with_context = messages + [{"role": "system", "content": "Voici un document qui peut t'aider : " + docs[best_doc]}]

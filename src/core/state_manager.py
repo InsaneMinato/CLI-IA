@@ -2,8 +2,12 @@ import sqlite3
 from sqlite3 import Error
 import json
 
+
 conn = sqlite3.connect("messages.db")
 cursor = conn.cursor()
+messages=[
+    {"role": "system", "content": "Tu es un assistant personnel pour un developpeur junior. Réponds en texte brut, sans Markdown, sans astérisques ni tableaux."}
+]
 
 cursor.execute("""
                CREATE TABLE IF NOT EXISTS messages (
@@ -26,3 +30,9 @@ def save_message(role, content):
     except Error as e:
         return f"Erreur : {str(e)}"
 
+
+def add_message(role: str, content: str):
+    messages.append({{"role": role, "content": content}})
+
+def get_messages():
+    return messages.copy()

@@ -167,9 +167,7 @@ def save_message(role, content):
 	
 
 
-messages=[
-	{"role": "system", "content": "Tu es un assistant personnel pour un developpeur junior. Réponds en texte brut, sans Markdown, sans astérisques ni tableaux."}
-]
+
 
 try:
 	while True:
