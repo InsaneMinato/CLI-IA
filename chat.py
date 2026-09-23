@@ -28,6 +28,9 @@ conn.commit()
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 print("Tables vues par Python :", cursor.fetchall())
 
+messages=[
+	{"role": "system", "content": "Tu es un assistant personnel pour un developpeur junior. Réponds en texte brut, sans Markdown, sans astérisques ni tableaux."}
+]
 
 tools = [
 	{

@@ -1,3 +1,5 @@
+import json
+from tools import get_file_content, modify_file_content, get_current_time
 
 def get_tools ():
     return [
@@ -47,3 +49,27 @@ def get_tools ():
             },
         },
     ]
+
+def tool_call(reply):
+    tool_name = reply.tool_calls[0].function.name
+    arguments = reply.tool_calls[0].function.arguments
+
+    if isinstance(arguments, str):
+        arguments = json.loads(arguments)
+    print("Le modèle veut appeler :", tool_name)
+
+    if tool_name == "get_current_time":
+        result = get_current_time()
+    elif tool_name == "get_file_content":
+        file_path = arguments.get("file_path")
+        result = get_file_content(file_path)
+    elif tool_name == "modify_file_content":
+        file_path = arguments.get("file_path")
+        old_content = arguments.get("old_content")
+        new_content = arguments.get("new_content")
+
+        result = modify_file_content(file_path, old_content, new_content)
+    else:
+        raise ValueError(f"Outil inconnu : {tool_name}")
+
+    return result
