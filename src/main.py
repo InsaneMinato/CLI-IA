@@ -1,4 +1,4 @@
-from core import add_message, check_and_add_system_message, connect_db, get_messages, initialize_db, send_message
+from core import add_message, check_and_add_system_message, connect_db, get_messages, initialize_db, send_message, delete_all_messages
 from services import get_tools, tool_call
 
 conn = connect_db()
@@ -18,16 +18,18 @@ try:
         add_message("user", user_input, conn)
 
         try:
-            reply = send_message(get_messages(conn), tools)
+            messages = get_messages(conn)
+            reply = send_message(messages, tools)
 
             if reply.tool_calls:
-
                 result = tool_call(reply)
-                tool_name = reply.tool_calls[0].function.name
-                add_message("IA", f"[a demandé l'outil {tool_name}]", conn)
-                add_message("tool", result, conn)
+                assistant_message = reply.model_dump(exclude_none=True)
+                messages.extend([
+                    assistant_message,
+                    {"role": "tool", "content": result},
+                ])
 
-                final_reply = send_message(get_messages(conn), tools).content
+                final_reply = send_message(messages, tools).content
                 add_message("IA", final_reply, conn)
                 print("IA : ", final_reply)
 
@@ -38,5 +40,6 @@ try:
             print("Erreur : ", e)
             continue
 finally:
+    delete_all_messages(conn)
     conn.close()
     print("Connexion à la base de données fermée.")

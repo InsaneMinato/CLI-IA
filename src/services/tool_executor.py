@@ -51,8 +51,12 @@ def get_tools ():
     ]
 
 def tool_call(reply):
-    tool_name = reply.tool_calls[0].function.name
-    arguments = reply.tool_calls[0].function.arguments
+    if not reply.tool_calls:
+        raise ValueError("Le message ne contient aucun appel d'outil.")
+
+    tool_call = reply.tool_calls[0]
+    tool_name = tool_call.function.name
+    arguments = tool_call.function.arguments
 
     if isinstance(arguments, str):
         arguments = json.loads(arguments)

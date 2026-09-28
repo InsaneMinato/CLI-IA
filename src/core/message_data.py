@@ -1,9 +1,13 @@
 from typing import Any
+from pathlib import Path
 import sqlite3
 from sqlite3 import Error
 
+DATABASE_PATH = Path(__file__).resolve().parents[2] / "messages.db"
+
+
 def connect_db() -> sqlite3.Connection:
-    return sqlite3.connect("messages.db")
+    return sqlite3.connect(DATABASE_PATH)
 
 def initialize_db(conn: sqlite3.Connection):
     cursor = conn.cursor()
@@ -60,3 +64,11 @@ def get_messages(conn: sqlite3.Connection) -> list[dict[str, Any]]:
         api_role = "assistant" if role == "IA" else role
         messages.append({"role": api_role, "content": content})
     return messages
+
+def delete_all_messages(conn: sqlite3.Connection):
+    try:
+        conn.cursor().execute("DELETE FROM messages")
+        conn.commit()
+        print("Tous les messages ont été supprimés avec succès.")
+    except Error as e:
+        print(f"Erreur lors de la suppression des messages : {str(e)}")
