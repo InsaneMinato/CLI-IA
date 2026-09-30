@@ -1,5 +1,6 @@
 import json
-from tools import get_file_content, modify_file_content, get_current_time
+import shlex
+from tools import execute_command, get_file_content, modify_file_content, get_current_time
 
 def get_tools ():
     return [
@@ -48,6 +49,23 @@ def get_tools ():
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "execute_shell_command",
+                "description": "Exécute une commande shell et retourne la sortie.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "La commande à exécuter. Seules touch, ls et mkdir sont autorisées, avec au plus un chemin en argument."
+                        }
+                    },
+                    "required": ["command"]
+                }
+            }
+        }
     ]
 
 def tool_call(reply):
@@ -73,6 +91,20 @@ def tool_call(reply):
         new_content = arguments.get("new_content")
 
         result = modify_file_content(file_path, old_content, new_content)
+    elif tool_name == "execute_shell_command":
+        command = arguments.get("command")
+        if not isinstance(command, str):
+            raise ValueError("La commande shell doit être une chaîne de caractères.")
+        try:
+            command_parts = shlex.split(command)
+        except ValueError as error:
+            raise ValueError(f"Commande shell invalide : {error}") from error
+
+        if not command_parts or command_parts[0] not in {"touch", "ls", "mkdir"}:
+            raise ValueError(f"Commande shell non autorisée : {command}")
+        if len(command_parts) > 2:
+            raise ValueError(f"Commande shell non autorisée : {command}")
+        result = execute_command(command_parts[0], *command_parts[1:])
     else:
         raise ValueError(f"Outil inconnu : {tool_name}")
 

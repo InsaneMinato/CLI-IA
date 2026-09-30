@@ -1,10 +1,8 @@
-
-
 import os
 from pathlib import Path
 
 
-def _resolve_file_path(file_path):
+def resolve_file_path(file_path):
     if not isinstance(file_path, (str, os.PathLike)):
         raise TypeError("Le chemin du fichier doit être une chaîne de caractères.")
 
@@ -50,7 +48,7 @@ def _resolve_file_path(file_path):
 
 def get_file_content(file_path):
     try:
-        resolved_path = _resolve_file_path(file_path)
+        resolved_path = resolve_file_path(file_path)
         with open(resolved_path, "r", encoding="utf-8") as f:
             return f.read()
     except Exception as e:
@@ -59,7 +57,7 @@ def get_file_content(file_path):
 
 def modify_file_content(file_path, old_content, new_content):
     try:
-        resolved_path = _resolve_file_path(file_path)
+        resolved_path = resolve_file_path(file_path)
         if not isinstance(old_content, str) or not isinstance(new_content, str):
             raise TypeError("Les contenus à remplacer doivent être des chaînes de caractères.")
 
